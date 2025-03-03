@@ -6,5 +6,5 @@
 int main(void){
 
     createWindow(window, 1);
-
+    
 }
