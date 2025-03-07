@@ -88,7 +88,11 @@ void input(GLFWwindow* window){
 }
 
 void backgroundColor( int r, int g, int b, int a){
+
+/* Change la couleur du fond */
+
     glClearColor(r, g, b, a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 }
 
