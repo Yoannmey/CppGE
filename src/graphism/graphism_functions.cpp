@@ -4,17 +4,16 @@
 #include <cmath>
 #include "../constant.h"
 #include "graphism_functions.h"
+#include "../main.h"
+#include "shader.h"
 
 using namespace std;
-
 
 int createWindow(GLFWwindow*& window, int fullscreen){
 
 /* Fonction pour créer une fenêtre, elle prends comme paramètres le pointeur sur window, et la variable fullscreen qui prends comme valeur 1 si true */
 
-    if (!glfwInit()){
-        return -1;
-    }
+    glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -36,14 +35,17 @@ int createWindow(GLFWwindow*& window, int fullscreen){
         window = glfwCreateWindow(window_width, window_height, WINDOW_NAME, NULL, NULL);
     }
     
-    if (!window){
+    if (window == NULL){
+        // cout << "La fenetre n'a pas pu etre crée" << endl;
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
 
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    gladLoadGL();
+
+    glViewport(0,0,window_width, window_height);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
 
@@ -51,31 +53,35 @@ int createWindow(GLFWwindow*& window, int fullscreen){
         return -1;
     }
 
-    if(fullscreen == 1){
-        glViewport(0, 0, 1920, 1080);
-    }
-    else{
-        glViewport(0, 0, window_width, window_height);
-    }
+    // gameSetUp();
 
     while (!glfwWindowShouldClose(window)){
         
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         input(window);
 
-        drawTriangleTest(10,900,100,900,45,500);
+        shader(1);
+        // gameLoop();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    glDeleteVertexArrays(2, &VAO);
+	glDeleteBuffers(2, &VBO);
+	glDeleteProgram(shaderProgram);
+
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return fullscreen;
 }
 
 void input(GLFWwindow* window){
+
+/* Gére les events liés à la souris et au clavier */
 
     if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
         glfwSetMouseButtonCallback(window, checkMousePos);
@@ -87,18 +93,23 @@ void input(GLFWwindow* window){
 
 }
 
-void backgroundColor( int r, int g, int b, int a){
+void backgroundColor( float r, float g, float b, float a){
 
-/* Change la couleur du fond */
+/* Change la couleur du fond et divisant les valeurs par 255 afin qu'elles soient comprises entre 0 et 1*/
+
+    r = r/255;
+    g = g/255;
+    b = b/255;
+    cout << "colors: " << r << " " << g << " " << b << endl;
 
     glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 }
 
 void checkMousePos(GLFWwindow* window, int button, int action, int mods){
 
-/* Donne la position du curseur */
+/* Donne la position du curseur, il convertit la position donnée par GLFW en int et l'affiche dans le terminal, si la fenetre est en plein écran
+   les coordonées de départ sont 32000 et 32000 au lieu de 0 0*/
 
     double DposX, DposY;
 
@@ -119,57 +130,9 @@ void checkMousePos(GLFWwindow* window, int button, int action, int mods){
 
 float convertToOpengl(float point, float taille){
 
-/* Converti les coordonées */
+/* Converti les coordonées, grâce à la coordonnée x ou y du point ainsi que la taille de la fenetre, width pour x et height pour y*/
 
     float openPoint = (point/taille)*2-1;
 
     return openPoint;
-}
-
-void drawTriangleTest(int xGauche, int yGauche, int xDroite, int yDroite, int xHaut, int yHaut){
-
-/* Dessine un triangle */
-
-    glGenVertexArrays(1, &VertexArrayID); 
-    glBindVertexArray(VertexArrayID);
-
-    float xG = convertToOpengl(xGauche, window_width);
-    float xD = convertToOpengl(xDroite, window_width);
-    float xH = convertToOpengl(xHaut, window_width);
-
-    float yG = convertToOpengl(yGauche, window_width);
-    float yD = convertToOpengl(yDroite, window_width);
-    float yH = convertToOpengl(yHaut, window_width);
-
-    static const GLfloat g_vertex_buffer_data[] = { 
-        xG, yG, 0.0f, 
-        xD, yD, 0.0f, 
-        xH, yH, 0.0f, 
-     };
-     
-
-    glGenBuffers(1, &vertexbuffer); 
-    
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer); 
-    
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0); 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer); 
-    glVertexAttribPointer( 
-    0,                  
-    3,                  
-    GL_FLOAT,           
-    GL_FALSE,           
-    0,                  
-    (void*)0            
-    ); 
-    
-    
-    glDrawArrays(GL_TRIANGLES, 0, 3); 
-    
-    glDisableVertexAttribArray(0);
-
 }
