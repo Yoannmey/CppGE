@@ -5,9 +5,25 @@
 #include "../constant.h"
 #include "graphism_functions.h"
 #include "../main.h"
-#include "shader.h"
+#include "shaders/shaders.h"
+#include "shaders/shaderCompilation.h"
 
 using namespace std;
+
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
+
+const char* fragmentShaderSource ="#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n" 
+"{\n"
+"   FragColor = vec4(1.0f, 1.0f, 0.02f, 1.0f);\n"
+"}\n\0";
+
 
 int createWindow(GLFWwindow*& window, int fullscreen){
 
@@ -55,15 +71,36 @@ int createWindow(GLFWwindow*& window, int fullscreen){
 
     // gameSetUp();
 
-    while (!glfwWindowShouldClose(window)){
+    GLfloat positions[] =
+    {
+        -0.0f, -0.5f, 0.0f,  // Bas gauche
+        0.5f,   -0.5f, 0.0f  // Haut gauche
+         -0.5f,  0.5f, 0.0f, // Bas droite
+         -0.5f,   0.5f, 0.0f, // Haut droite
+    };
+
+    GLuint shaderProgramOrange;
+
+    shaderProgramOrange = shaderCompilation(shaderProgramOrange,vertexShaderSource, fragmentShaderSource);
+
+    GLuint VAO, VBO;
+
+    VAO = createShaderVAO(VAO, VBO, positions, sizeof(positions));
+
+    VBO = createVBO(VBO);
+
+    cout << "program: " << shaderProgramOrange << "VAO :" << VAO << "VBO :" << VBO << endl;
+
+     while (!glfwWindowShouldClose(window)){
         
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         input(window);
 
-        shader(1);
         // gameLoop();
+
+        shader(shaderProgramOrange, VAO);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -71,7 +108,7 @@ int createWindow(GLFWwindow*& window, int fullscreen){
 
     glDeleteVertexArrays(2, &VAO);
 	glDeleteBuffers(2, &VBO);
-	glDeleteProgram(shaderProgram);
+	glDeleteProgram(shaderProgramOrange);
 
     glfwDestroyWindow(window);
     glfwTerminate();
