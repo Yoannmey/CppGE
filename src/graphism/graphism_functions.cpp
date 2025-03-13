@@ -4,26 +4,10 @@
 #include <cmath>
 #include "../constant.h"
 #include "graphism_functions.h"
-#include "../main.h"
 #include "shaders/shaders.h"
 #include "shaders/shaderCompilation.h"
 
 using namespace std;
-
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderSource ="#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n" 
-"{\n"
-"   FragColor = vec4(1.0f, 1.0f, 0.02f, 1.0f);\n"
-"}\n\0";
-
 
 int createWindow(GLFWwindow*& window, int fullscreen){
 
@@ -69,27 +53,13 @@ int createWindow(GLFWwindow*& window, int fullscreen){
         return -1;
     }
 
-    // gameSetUp();
+    GLfloat positions[18]; 
 
-    GLfloat positions[] =
-    {
-        -0.0f, -0.5f, 0.0f,  // Bas gauche
-        0.5f,   -0.5f, 0.0f  // Haut gauche
-         -0.5f,  0.5f, 0.0f, // Bas droite
-         -0.5f,   0.5f, 0.0f, // Haut droite
-    };
+    rectPosition18(0, 0, 200,300,positions);
 
-    GLuint shaderProgramOrange;
+    vertexArray VABO1 = createShader(VABO1.VAO, VABO1.VBO, positions, sizeof(positions), VABO1.shaderProgram, vertexShaderSource, fragmentShaderSource);
 
-    shaderProgramOrange = shaderCompilation(shaderProgramOrange,vertexShaderSource, fragmentShaderSource);
-
-    GLuint VAO, VBO;
-
-    VAO = createShaderVAO(VAO, VBO, positions, sizeof(positions));
-
-    VBO = createVBO(VBO);
-
-    cout << "program: " << shaderProgramOrange << "VAO :" << VAO << "VBO :" << VBO << endl;
+    // cout << "program: " << shaderProgramOrange << "VAO :" << VAO1 << "VBO :" << VBO << endl;
 
      while (!glfwWindowShouldClose(window)){
         
@@ -98,18 +68,13 @@ int createWindow(GLFWwindow*& window, int fullscreen){
 
         input(window);
 
-        // gameLoop();
-
-        shader(shaderProgramOrange, VAO);
+        shaderLoopSquare(VABO1.shaderProgram, VABO1.VAO);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(2, &VAO);
-	glDeleteBuffers(2, &VBO);
-	glDeleteProgram(shaderProgramOrange);
-
+    shaderDelete(VABO1.VAO,VABO1.VBO, VABO1.shaderProgram);
     glfwDestroyWindow(window);
     glfwTerminate();
 
@@ -159,7 +124,7 @@ void checkMousePos(GLFWwindow* window, int button, int action, int mods){
         posX -= 32000;
         posY -= 32000;
     }
-    
+    posY = window_height - posY;
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
         cout << "Mouse pos is: " << posX << "X " << posY << "Y" << endl;
     }
@@ -172,4 +137,89 @@ float convertToOpengl(float point, float taille){
     float openPoint = (point/taille)*2-1;
 
     return openPoint;
+}
+
+GLfloat trianglePosition12(int x, int y, int longueur, GLfloat* positions){
+
+    // En bas à gauche
+    positions[0] = convertToOpengl(x, window_width);
+    positions[1] = convertToOpengl(y, window_height);
+    positions[2] = 0.0f;
+
+    // En bas à droite
+    positions[3] = convertToOpengl(x + longueur, window_width);
+    positions[4] = convertToOpengl(y, window_height);
+    positions[5] = 0.0f;
+
+    // En haut à droite
+    positions[6] = convertToOpengl(x + longueur, window_width);
+    positions[7] = convertToOpengl(y + longueur, window_height);
+    positions[8] = 0.0f;
+
+}
+
+GLfloat squarePosition18(int x, int y, int longueur, GLfloat* positions){
+
+    // En bas à gauche
+    positions[0] = convertToOpengl(x, window_width);
+    positions[1] = convertToOpengl(y, window_height);
+    positions[2] = 0.0f;
+
+    // En bas à droite
+    positions[3] = convertToOpengl(x + longueur, window_width);
+    positions[4] = convertToOpengl(y, window_height);
+    positions[5] = 0.0f;
+
+    // En haut à gauche
+    positions[6] = convertToOpengl(x, window_width);
+    positions[7] = convertToOpengl(y + longueur, window_height);
+    positions[8] = 0.0f;
+
+    // En haut à gauche
+    positions[9] = convertToOpengl(x, window_width);
+    positions[10] = convertToOpengl(y + longueur, window_height);
+    positions[11] = 0.0f;
+
+    // En haut à droite
+    positions[12] = convertToOpengl(x + longueur, window_width);
+    positions[13] = convertToOpengl(y + longueur, window_height);
+    positions[14] = 0.0f;
+    // En bas à droite
+    positions[15] = convertToOpengl(x + longueur, window_width);
+    positions[16] = convertToOpengl(y, window_height);
+    positions[17] = 0.0f;
+
+}
+
+GLfloat rectPosition18(int x, int y, int largeur, int longueur, GLfloat* positions){
+
+    // En bas à gauche
+    positions[0] = convertToOpengl(x, window_width);
+    positions[1] = convertToOpengl(y, window_height);
+    positions[2] = 0.0f;
+
+    // En bas à droite
+    positions[3] = convertToOpengl(x + largeur, window_width);
+    positions[4] = convertToOpengl(y, window_height);
+    positions[5] = 0.0f;
+
+    // En haut à gauche
+    positions[6] = convertToOpengl(x, window_width);
+    positions[7] = convertToOpengl(y + longueur, window_height);
+    positions[8] = 0.0f;
+
+    // En haut à gauche
+    positions[9] = convertToOpengl(x, window_width);
+    positions[10] = convertToOpengl(y + longueur, window_height);
+    positions[11] = 0.0f;
+
+    // En haut à droite
+    positions[12] = convertToOpengl(x + largeur, window_width);
+    positions[13] = convertToOpengl(y + longueur, window_height);
+    positions[14] = 0.0f;
+    // En bas à droite
+    positions[15] = convertToOpengl(x + largeur, window_width);
+    positions[16] = convertToOpengl(y, window_height);
+    positions[17] = 0.0f;
+
 }

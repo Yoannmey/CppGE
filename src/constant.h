@@ -12,3 +12,6 @@ extern int window_height;
 
 extern GLuint vertexbuffer; 
 extern GLuint VertexArrayID; 
+
+extern const char* vertexShaderSource;
+extern const char* fragmentShaderSource;

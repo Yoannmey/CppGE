@@ -3,8 +3,16 @@
 #include <glfw3.h>
 #include "../../constant.h"
 
-GLuint createShaderVAO(GLuint VAO, GLuint VBO, GLfloat* vertexs, int size);
+typedef struct {
+    GLuint VAO;
+    GLuint VBO;
+    GLuint shaderProgram;
+} vertexArray;
 
-GLuint createVBO(GLuint VBO);
+vertexArray createShader(GLuint VAO, GLuint VBO, GLfloat* vertexs, int size, GLuint shaderProgram, const char* vertexSource, const char* fragmentSource );
 
-void shader(GLuint shaderProgram, GLuint VAO);
+void shaderLoopTriangle(GLuint shaderProgram, GLuint VAO);
+
+void shaderLoopSquare(GLuint shaderProgram, GLuint VAO);
+
+void shaderDelete(GLuint VAO, GLuint VBO, GLuint shaderProgram);

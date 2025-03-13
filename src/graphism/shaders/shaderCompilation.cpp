@@ -4,15 +4,10 @@
 #include <cmath>
 #include "../../constant.h"
 #include "../graphism_functions.h"
-#include "../../main.h"
 
 using namespace std;
 
-
-
 GLuint shaderCompilation(GLuint shaderProgram, const char* vertexSource, const char* fragmentSource){
-
-    cout << "test" << endl;
 
     /* Cette fonction créer le shaderProgram grâce au vertex et au fragment sélectionné */
     
@@ -31,8 +26,6 @@ GLuint shaderCompilation(GLuint shaderProgram, const char* vertexSource, const c
     
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
-    
-        cout << "test2" << endl;
 
         return shaderProgram;
 }

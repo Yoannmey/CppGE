@@ -13,6 +13,6 @@ void gameLoop(){
 
 int main(void){
 
-    createWindow(window, 0);
+    createWindow(window, 1);
     
 }
